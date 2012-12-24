@@ -1,0 +1,76 @@
+/*.contenu_texte h3 { font-size: 1.286em; line-height: 1.222em; margin: 1.833em 0 0.611em 0; }*/
+.contenu_texte { font-size: 1.4em; line-height: 1.571em; }
+.contenu_texte p { margin-bottom: 0.571em; }
+.contenu_texte p.note, .contenu_texte p.alert { padding: 0.571em 0.786em; }
+.contenu_texte ul { margin: 0 0 0.571em 1.571em; }
+.contenu_texte li { margin: 0 0 0.571em 1.571em;font-weight: bold;font-size:11px; }
+.contenu_texte ol { margin: 0 0 1.571em 1.571em; }
+.contenu_texte ul ul, .contenu_texte ul ol, .contenu_texte ol ul, .contenu_texte ol ol { margin: 0 0 0 1.571em; }
+.contenu_texte dl { margin-bottom: 1.571em; }
+.contenu_texte dd { margin-bottom: 1.571em; }
+.contenu_texte blockquote { margin: 0 0 1.571em 0.786em; padding-left: 0.786em; }
+
+.contenu_texte h3{
+    color:#090;
+    font-size:16px;
+    font-weight:bold;
+    border-bottom: #ccc solid 1px;
+}
+label{
+    display:inline-block;
+    width: 190px;
+    margin: 0px 20px 0px 0px;
+}
+label.forum{
+    width: 190px;
+    margin: 0px;
+}
+label.radio{
+    width: 95px;
+}
+.required{
+    margin-left: -7px;
+}
+.required:before {
+    color:#e50000;
+    font-size:11px;
+    content: "* ";
+}
+input[type="text"]{
+    min-height:20px; width: 195px;
+    border:#ddd solid 1px;
+    margin: 0px 10px 2px 0px;
+    border-radius: 4px;
+}
+input.long{
+    display: inline-block;
+    width: 405px;
+}
+input.montant{
+    width: 120px;
+}
+textarea{
+    width: 405px; height: 100px;
+    border:#ddd solid 1px;
+}
+input:focus, input:hover,
+radio:focus, radio:hover,
+textarea:focus, txtarea:hover{
+    outline: none;
+    box-shadow: 0px 0px 2px #303;
+}
+#rd_autre{
+    margin-left: 9px;
+}
+
+.clearfix{clear:both;}
+
+.bt_send{
+    margin-top:10px;
+    width:190px; height:30px;
+    font-size:16px; font-weight:bold;    
+}
+.red {
+    color:#e50000;
+    font-size:11px;
+}
