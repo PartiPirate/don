@@ -282,7 +282,7 @@ function saveAdhesionFormValues(&$aValues){
 	)";
 	
 	$sInsertAdherent = "INSERT INTO `PP_ADHERENT` (
-	`inscritForum`, 
+	`isMajeur`, `inscritForum`, 
 	`pseudonymeForum`, `identifiantClePGP`, `urlClePGP`, 
 	`SECTION_LOCALE_oid`, 
 	`abonnementML`, `infoCreationSectionLocale`,
@@ -290,7 +290,7 @@ function saveAdhesionFormValues(&$aValues){
 	`PERSONNE_oid`
 	) 
 	VALUES (
-		%d, 
+		%d, %d, 
 		%s, %s, %s, 
 		%d, 
 		%s, %s,
@@ -299,13 +299,13 @@ function saveAdhesionFormValues(&$aValues){
 	)";
 	
 	$sInsertAdhesion = "INSERT INTO `PP_ADHESION` (
-	`reference`, `montantCotisation`, 
+	`reference`, `montantCotisation`, `isRenouvellement`, 
 	`accepteRiStatut`, `declarationHonneur`, `optinStat`, 
 	`dateCreation`,
 	`ADHERENT_oid`
 	) 
 	VALUES (
-		%s, %.2f, 
+		%s, %.2f, %d, 
 		%d, %d,  %d, 
 		%s,
 		%d
@@ -372,6 +372,7 @@ function saveAdhesionFormValues(&$aValues){
 			if($aValues['personne.hasAdhesion']){
 	
 				$sInsertAdherentSQL = sprintf($sInsertAdherent,
+					$aValues['adherent.isMajeur'],
 					$aValues['adherent.inscritForum'],
 					$oDBH->quote($aValues['adherent.pseudonymeForum']),
 					$oDBH->quote($aValues['adherent.identifiantPGP']),
@@ -389,6 +390,7 @@ function saveAdhesionFormValues(&$aValues){
 				$sInsertAdhesionSQL = sprintf($sInsertAdhesion,
 					$oDBH->quote($aValues['adhesion.reference']),
 					$aValues['adhesion.montantCotisation'],
+					$aValues['adhesion.isRenouvellement'],
 					$aValues['adhesion.accepteRIStatut'],
 					$aValues['adhesion.declarationHonneur'],
 					$aValues['adhesion.optinStat'],
@@ -495,7 +497,7 @@ function createFormApayerfr(&$aValues, $sTextBouton = "Payer maintenant"){
 	}
 	$sMontant = sprintf('%.2f', $aValues['don.montantDon'] + $aValues['adhesion.montantCotisation']);
 	
-	$sCommentaire = sprintf("Adhésion : %s \r\nDon :%s", $aValues['adhesion.reference'], $aValues['don.reference'] );
+	$sCommentaire = sprintf("Adhésion : %s \r\nDon : %s", $aValues['adhesion.reference'], $aValues['don.reference'] );
 	$sForm = <<<EOT
 	
 <form method="POST" action="https://www.apayer.fr{$sAction}" id="formApayerfr" accept-charset="ISO-8859-1">

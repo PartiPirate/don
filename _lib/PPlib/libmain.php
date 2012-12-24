@@ -15,9 +15,9 @@ define('ACTION_SUCCESS', 'OK');
 define('ACTION_FAILURE', 'FAIL');
 define('ACTION_ERROR', 'ERROR');
 
-define('SQL_DSN', 'mysql:dbname=spip_adhesion;host=cale.partipirate.ppo');
-define('SQL_USER', '**');
-define('SQL_PASSWD', '**');
+define('SQL_DSN', 'mysql:dbname=don;host=cale.partipirate.ppo');
+define('SQL_USER', 'don');
+define('SQL_PASSWD', 'tW342XX6Cf2ndd');
 
 define ("CMCIC_CLE", "0000000000000000000000000000000000000000");
 define ("CMCIC_TPE", "0000000");

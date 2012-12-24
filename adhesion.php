@@ -31,6 +31,7 @@ else{
 						<div id="content">
 							<div class="post_box">
 								<div class="headline_area">
+								<h2 style="color:red">Attention, ce formulaire est à diffusion restreinte pour beta-test en interne</h2>
 <?php
 if ($type_action === 'adhesion') {
 ?>
@@ -52,7 +53,7 @@ else{
 						</div>
 								<div class="contenu_texte">
 <?php include '_lib/validate.php'; ?>
-<form id="DoValider" method="POST">
+<form id="DoValider" method="POST" accept-charset="utf-8">
 	<input type="hidden" name="type_action" value="<?php echo $type_action; ?>">
 	<span class="red">* champs obligatoires</span>
 	<h3>Vos coordonnées</h3>
@@ -64,7 +65,7 @@ else{
 	<input type="text" id="frm_eml" name="personne_email" value="<?php echo htmlentities(@$_POST['personne_email']); ?>">
 	<br>
 	<div class="required">
-		<input type="checkbox" id="frm_ddn" name="adherent_isMajeur" <?php if(isset($_POST['adherent_isMajeur'])) { echo 'checked'; }?>>
+		<input type="checkbox" id="frm_ddn" name="adherent_isMajeur" <?php if(@$_POST['adherent_isMajeur']) { echo 'checked'; }?> value="1">
 		<label for="frm_ddn">Je suis majeur</label>
 	</div>
 	<br><label class="required" for="frm_adr">Adresse fiscale</label>

@@ -17,6 +17,7 @@
 						<div id="content">
 							<div class="post_box">
 								<div class="headline_area">
+								<h2 style="color:red">Attention, ce formulaire est à diffusion restreinte pour beta-test en interne</h2>
                                     <h2>Comment souhaitez vous contribuer ?</h2>
 									</div>
 								<div class="contenu_texte">

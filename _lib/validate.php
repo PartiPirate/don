@@ -29,7 +29,7 @@ $aValues = array(
 	'personne.email' => @$_POST['personne_email'],
 	'personne.telephone' => @$_POST['personne_telephone'],
 	'personne.pseudonyme' => @$_POST['personne_pseudonyme'],
-	'personne.autresInformations' => 'Renouvellement : '.@$_POST['renouvellement'],
+	'personne.autresInformations' => '',
 	'personne.commentaires' => @$_POST['personne_commentaires'],
 );
 
@@ -97,7 +97,7 @@ echo str_repeat('-', 60), "\n";
 print_r($aValues);
 
 echo str_repeat('-', 60), "\n\n";
-*/
+die();*/
 if($aResult['issue'] == ACTION_SUCCESS){
 	// Affichage du formulaire à payer
 	$sHtmlFormCode = PPlib\adhesion\createFormApayerfr($aValues, "Payer maintenant sur Apayer.fr");
