@@ -6,6 +6,9 @@ include_once sprintf('%s/adhesion.php', PPLIB_PATH);
 if(!count($_POST)) {
 	return;
 }
+foreach($_POST as &$value) {
+	$value = utf8_decode($value);
+}
 
 $aValues = array(
 	// 'personne.oid' => NULL,
