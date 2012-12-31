@@ -16,22 +16,21 @@
 					<div id="content_box">
 						<div id="content">
 							<div class="post_box">
-								<div class="headline_area">
-								<h2 style="color:red">Attention, ce formulaire est à diffusion restreinte pour beta-test en interne</h2>
-                                    <h2>Comment souhaitez vous contribuer ?</h2>
-									</div>
-								<div class="contenu_texte">
-									<h3>Adhérer au Parti Pirate</h3>
-									<p>En adhérent au Parti Pirate, vous pourrez contribuer activement au sein du parti et nous aider à promouvoir notre projet politique à travers les actions que nous menerons ensemble. Ceci implique de votre part de vous engager à respecter nos statuts et à participer lors des assemblées générales et consultations programmatique (démocratique liquide, construction du programme, ...).</p>
-									<p><a href="adhesion.php">Cliquez ici pour adhérer.</a></p>
-									<h3>Faire un don au Parti Pirate</h3>
-									<p>Le Parti Pirate a besoin d'argent pour continuer d'exister et pour soutenir les projets que nous menons. En tant que Parti Politique, nous devons faire face à diverses dépenses, ne serait-ce que pour pouvoir présenter des candidats.</p>
-									<p>Le Parti Pirate a le soucis de la transparence sur sa gestion interne et en plus des contrôles de commissaires aux comptes et de la <a href="http://www.cnccfp.fr/" target="_blank">cnccfp</a>, nous publions l'ensemble de nos comptes (annonymisés) en quasi temps réel. Voir <b>** Romain faut que tu me file le lien **</b> </p>
-									<p><a href="don.php">Cliquez ici pour donner.</a></p>
-			</div>
-		</div>
-	</div>
+<div class="headline_area">
+	<h2>Comment souhaitez vous contribuer ?</h2>
 </div>
+<div class="contenu_texte">
+	<h3>Adhérer au Parti Pirate</h3>
+	<p>En adhérent au Parti Pirate, vous pourrez contribuer activement au sein du parti et nous aider à promouvoir notre projet politique à travers les actions que nous menerons ensemble. Ceci implique de votre part de vous engager à respecter nos statuts et à participer lors des assemblées générales et consultations programmatique (démocratique liquide, construction du programme, ...).</p>
+	<p><a href="adhesion.php">Cliquez ici pour adhérer.</a></p>
+	<h3>Faire un don au Parti Pirate</h3>
+	<p>Le Parti Pirate a besoin d'argent pour continuer d'exister et pour soutenir les projets que nous menons. En tant que Parti Politique, nous devons faire face à diverses dépenses, ne serait-ce que pour pouvoir présenter des candidats.</p>
+	<p>Le Parti Pirate a le soucis de la transparence sur sa gestion interne et en plus des contrôles de commissaires aux comptes et de la <a href="http://www.cnccfp.fr/" target="_blank">cnccfp</a>, nous publions l'ensemble de nos comptes (anonymisés) <a href="http://www.romainriviere.fr/PP/Comptes/" target="_blank">en quasi temps réel</a> (ceci est encore expérimental).</p>
+	<p><a href="don.php">Cliquez ici pour donner.</a></p>
+</div>
+							</div>
+						</div>
+					</div>
 					<div id="sidebar_2" class="sidebar">
 						<ul class="sidebar_list">
 							<li class="widget">

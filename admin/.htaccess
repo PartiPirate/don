@@ -1,0 +1,8 @@
+deny from all
+allow from 10.65.209.14 #Mistral
+AuthUserFile /var/www/don-beta.partipirate.ppo/.htpasswd
+AuthGroupFile /dev/null
+AuthName "Restricted Access"
+AuthType Basic
+require valid-user
+satisfy all

@@ -17,8 +17,8 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- Contenu de la table `PP_DON_POSTE`
 --
 
-INSERT INTO `PP_DON_POSTE` (`oid`, `libelle`, `brief`, `idInt`, `type`, `order`) VALUES
-(1, 'Parti Pirate National : Budget général', 'Beaucoup de frais sont engagés par le Parti Pirate pour les dépenses "courantes". Il s''agit de la maintenance des serveurs, de l''organisation des assemblées générales, les assurances, les commissaires aux comptes, ...', 'general', 1, 1),
+REPLACE INTO `PP_DON_POSTE` (`oid`, `libelle`, `brief`, `idInt`, `type`, `order`) VALUES
+(1, 'Parti Pirate National : Budget général', 'Beaucoup de frais sont engagés par le Parti Pirate pour les dépenses "courantes". Il s''agit de la maintenance des serveurs, de l''organisation des assemblées générales, des assurances, des commissaires aux comptes, ...', 'general', 1, 1),
 (16, 'Section Locale Bretagne', '', 'sl_Bretagne', 5, 0),
 (2, 'Parti Pirate National : Budget Elections', 'Pour participer à une élection, le candidat doit payer de nombreux frais pour sa campagne (affiches, circulaires et bulletins de vote). Lors des élections législatives, une campagne "complète" coûtait (au plus bas) 2500 euros par candidat. Pour les élections à venir en 2014, le budget nécessaire serait de plusieurs centaines de milliers d''euros.', 'tresor_election', 2, 2),
 (17, 'Section Locale Alsace', '', 'sl_Alsace', 5, 0),

@@ -745,6 +745,158 @@ EOT;
 }//end function
 
 /**
+ * Valide la reception du paiement via Apayer
+ * @param array $results les valeurs à enregistrer
+ *      [datePaiement] => 24/12/12
+ *      [objetPaiement] => 1
+ *      [autreObjet] => 
+ *      [montant] => 50
+ *      [reference] => PER_201212240500_a9249e0
+ *      [commentaire] => Adhésion : ADH_201212240500_a9249e60 Don :DON_201212240500_aa9249e0
+ *      [referenceBancaire] => 
+ *      [numeroAutorisation] => 000056
+ *      [nom] => Nom
+ *      [prenom] => test
+ *      [adresse] => Adresse machin
+ *      [codePostal] => 00000
+ *      [ville] => Rennes
+ *      [courriel] => mistral@partipirate.org
+ *      [etat] => Paiement accepté (payé)
+ *      [motifRefus] => fzef
+ *      [cvx] => oui
+ *      [vld] => 0113
+ *      [brand] => MC
+ *      [status3DS] => 1
+ *      [PERSONNE_ref] => PER_201212240500_a9249e0
+ *      [ADHESION_ref] => ADH_201212240500_a9249e60
+ *      [DON_ref] => DON_201212240500_aa9249e0
+ * @param string $nameOrigin Nom de la référence d'importation
+ * @return bool pour le statut de l'enregistrement
+ */
+function validApayerfr(&$results, $nameOrigin = null){
+	try {
+		$date = explode('/', $results['datePaiement']);
+		$results['datePaiement'] = '20'.$date[2].'-'.$date[1].'-'.$date[0];
+		$results['objetPaiement'] = lib\toFloat($results['objetPaiement']);
+		$results['montant'] = lib\toFloat($results['montant']);
+		$results['cvx'] = (preg_match('/^(oui|1|o)$/i', $results['cvx'])?1:0);
+		$results['status3DS'] = lib\toInt($results['status3DS']);
+		
+		$montantBdd = 0;
+		$oDBH = lib\SqlGetHandle();
+		$results['isMatchRef'] = 0;
+		$results['PERSONNE_oid'] = null;
+		if(!empty($results['PERSONNE_ref'])) {
+			$oResult = $oDBH->query(sprintf("SELECT `oid` FROM `PP_PERSONNE` WHERE `reference` = %s", $oDBH->quote($results['PERSONNE_ref'])));
+			if($oRow = $oResult->fetch(\PDO::FETCH_OBJ)) {
+				$results['PERSONNE_oid'] = $oRow->oid;
+				$results['isMatchRef'] = 1;
+			}
+		}
+		$results['ADHESION_oid'] = null;
+		if(!empty($results['ADHESION_ref'])) {
+			$oResult = $oDBH->query(sprintf("SELECT `oid`, `montantCotisation` FROM `PP_ADHESION` WHERE `reference` = %s", $oDBH->quote($results['ADHESION_ref'])));
+			if($oRow = $oResult->fetch(\PDO::FETCH_OBJ)) {
+				$results['ADHESION_oid'] = $oRow->oid;
+				$montantBdd+= $oRow->montantCotisation;
+			} else {
+				$results['isMatchRef'] = 0;
+			}
+		}
+		$results['DON_oid'] = null;
+		if(!empty($results['DON_ref'])) {
+			$oResult = $oDBH->query(sprintf("SELECT `oid`, `montantDon` FROM `PP_DON` WHERE `reference` = %s", $oDBH->quote($results['DON_ref'])));
+			if($oRow = $oResult->fetch(\PDO::FETCH_OBJ)) {
+				$results['DON_oid'] = $oRow->oid;
+				$montantBdd+= $oRow->montantDon;
+			} else {
+				$results['isMatchRef'] = 0;
+			}
+		}
+		$results['isMatchAmount'] = ($results['montant'] == $montantBdd?1:0);
+		if(preg_match('/^Paiement accept/i', $results['etat'])) {
+			if($results['isMatchAmount'] and $results['isMatchRef']) {
+				$results['etatManuel'] = 1;
+			} else {
+				$results['etatManuel'] = -1;
+			}
+		} else {
+			$results['etatManuel'] = 0;
+		}
+		$results['oid'] = null;
+		//if(!empty($results['PERSONNE_ref'])) {
+			$oResult = $oDBH->query(sprintf("SELECT `oid` FROM `PP_APAYER_TRANSACTION` WHERE 
+				`datePaiement` = %s AND `referenceBancaire` = %s AND
+				`PERSONNE_oid` = %d AND `DON_oid` = %d AND `ADHESION_oid` = %d
+					ORDER BY `oid` DESC LIMIT 0,1", 
+				$oDBH->quote($results['datePaiement']), $oDBH->quote($results['referenceBancaire']),
+				$results['PERSONNE_oid'], $results['DON_oid'], $results['ADHESION_oid']));
+			if($oRow = $oResult->fetch(\PDO::FETCH_OBJ)) {
+				$results['oid'] = $oRow->oid;
+			}
+		//}
+		
+		
+		@$results['by'] = "REMOTE_ADDR={$_SERVER['REMOTE_ADDR']} - X-Real-IP={$_SERVER['X-Real-IP']} \r\nFROM : {$nameOrigin}";
+		
+		$sInsertApayer = "REPLACE INTO `PP_APAYER_TRANSACTION` (
+		`oid`, 
+		`PERSONNE_oid`, `DON_oid`,  `ADHESION_oid`, 
+		`isMatchRef`, `isMatchAmount`, 
+		`datePaiement`,
+		`objetPaiement`, `autreObjet`,
+		`montant`,
+		`reference`, `commentaire`,
+		`referenceBancaire`, `numeroAutorisation`,
+		`nom`, `prenom`, `adresse`, `codePostal`, `ville`, `courriel`,
+		`etat`, `etatManuel`,
+		`motifRefus`,
+		`cvx`, `vld`, `brand`, `status3DS`,
+		`by`
+		) 
+		VALUES (
+			%d, 
+			%d, %d, %d, 
+			%d, %d,
+			%s, 
+			%d, %s,
+			%.2f,
+			%s, %s,
+			%s, %s,
+			%s, %s, %s, %s, %s, %s,
+			%s, %d,
+			%s, 
+			%d, %s, %s, %d,
+			%s
+		)";
+		$sInsertApayerSQL = sprintf($sInsertApayer,
+			$results['oid'],
+			$results['PERSONNE_oid'], $results['DON_oid'], $results['ADHESION_oid'],
+			$results['isMatchRef'], $results['isMatchAmount'],
+			$oDBH->quote($results['datePaiement']),
+			$results['objetPaiement'], $oDBH->quote($results['autreObjet']), 
+			$results['montant'],
+			$oDBH->quote($results['reference']), $oDBH->quote($results['commentaire']),
+			$oDBH->quote($results['referenceBancaire']), $oDBH->quote($results['numeroAutorisation']),
+			$oDBH->quote($results['nom']), $oDBH->quote($results['prenom']), $oDBH->quote($results['adresse']), $oDBH->quote($results['codePostal']), $oDBH->quote($results['ville']), $oDBH->quote($results['courriel']),
+			$oDBH->quote($results['etat']), $results['etatManuel'],
+			$oDBH->quote($results['motifRefus']),
+			$results['cvx'], $oDBH->quote($results['vld']), $oDBH->quote($results['brand']), $results['status3DS'],
+			$oDBH->quote($results['by'])
+		);
+		//die($sInsertApayerSQL);
+		$oDBH->query($sInsertApayerSQL);
+		$iOidApayer = (int)$oDBH->lastInsertId();
+		if($results['etatManuel'] == -1) {
+			return -$iOidApayer;
+		}
+		return $iOidApayer;
+	} catch (PDOException $e) {
+		return NULL;
+	}
+}
+
+/**
  * Envoi un email à l'utilisateur et au secretaire pour le prévenir de l'enregistrement
  * @param array $aValues les valeurs à enregistrer, voir 'checkAdhesionFormValues' pour le détail
  * @return string le formulaire html
@@ -773,7 +925,7 @@ function sendNotification(&$aValues){
 	$oUserMail->AddReplyTo("secretaire@partipirate.org","Secrétaire Parti Pirate");
 	$oUserMail->SetFrom('secretaire@partipirate.org', 'Secrétaire Parti Pirate');
 	//$oUserMail->AddAddress($aValues['personne.email'], sprintf('%s %s', $aValues['personne.prenoms'], $aValues['personne.nom']));
-	$oUserMail->AddAddress("gabriel@burnweb.net","Sysadmin test"); // DEBUG
+	$oUserMail->AddAddress("mistral.oz@partipirate.org","Sysadmin test"); // DEBUG
 	
 	$oUserMail->Subject = "Votre adhésion ou don au Parti Pirate";
 	
@@ -802,7 +954,7 @@ function sendNotification(&$aValues){
 	$oSecMail->AddReplyTo("noreply@partipirate.org","Secrétaire Parti Pirate");
 	$oSecMail->SetFrom('noreply@partipirate.org', 'Secrétaire Parti Pirate');
 	//$oSecMail->AddAddress("secretaire@partipirate.org","Secrétaire Parti Pirate");
-	$oSecMail->AddAddress("gabriel@burnweb.net","Secrétaire Parti Pirate"); // DEBUG
+	$oSecMail->AddAddress("mistral.oz@partipirate.org","Secrétaire Parti Pirate"); // DEBUG
 	
 	$oSecMail->Subject = "Nouvelle adhésion ou don au Parti Pirate";
 	
