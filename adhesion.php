@@ -139,7 +139,7 @@ if ($type_action === 'adhesion' ) {
 $bActiveTresor = true;
 if($bActiveTresor){
 ?>
-	<h3>Contribuer à un budget spécifique</h3>
+	<h3>Contribuer à un budget spécifique par un don (facultatif)</h3>
 	
 	<?php
 	$arrayDon = PPlib\adhesion\listDonPostes();
