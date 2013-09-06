@@ -5,10 +5,11 @@ include_once sprintf('%s/adhesion.php', PPLIB_PATH);
 
 if(!count($_POST)) {
 	return;
-}
+}//end if
+
 foreach($_POST as &$value) {
 	$value = utf8_decode($value);
-}
+}//end foreach
 
 $aValues = array(
 	// 'personne.oid' => NULL,
@@ -34,61 +35,75 @@ $aValues = array(
 );
 
 $isAdhesion = (@$_POST['type_action'] == 'adhesion');
+
 if($isAdhesion) {
-$aValues = array_merge($aValues, array(
-	// 'adhesion.oid' => NULL,
-	// 'adhesion.reference' => NULL,
-	'personne.hasAdhesion' => 1,
-	'adherent.isMajeur' => @$_POST['adherent_isMajeur'],
-	'adherent.inscritForum' => @$_POST['adherent_inscritForum'],
-	'adherent.pseudonymeForum' => @$_POST['personne_pseudonyme'],
-	//'adherent.infoCreationSectionLocale' => 'Pays basque',
-	// 'adherent.identifiantPGP' => '0x123456789',
-	// 'adherent.urlPGP' => 'http://www.url.com/0x123456789',
-	'adherent.sectionLocale' => @$_POST['adherent_sectionlocale'],
-	'adhesion.montantCotisation' => @$_POST['adhesion_montantCotisation'],
 	
-	'adhesion.isRenouvellement' => @$_POST['adhesion_isRenouvellement'],
-	'adhesion.accepteRIStatut' => @$_POST['accepte'],
-	'adhesion.declarationHonneur' => @$_POST['accepte'],
-	'adhesion.optinStat' => @$_POST['accepte'],
-));
-$arrayML = PPlib\adhesion\listMailingLists();
-$aValues['adherent.abonnementML'] = '';
-foreach($arrayML as $ML) {
-	if(empty($_POST['ml_'.$ML['code']])) {
-		continue;
-	}
-	$aValues['adherent.abonnementML'].= $ML['code'].';';
-}
-}
+	$aValues = array_merge($aValues, array(
+		// 'adhesion.oid' => NULL,
+		// 'adhesion.reference' => NULL,
+		'personne.hasAdhesion' => 1,
+		'adherent.isMajeur' => @$_POST['adherent_isMajeur'],
+		'adherent.inscritForum' => @$_POST['adherent_inscritForum'],
+		'adherent.pseudonymeForum' => @$_POST['personne_pseudonyme'],
+		//'adherent.infoCreationSectionLocale' => 'Pays basque',
+		// 'adherent.identifiantPGP' => '0x123456789',
+		// 'adherent.urlPGP' => 'http://www.url.com/0x123456789',
+		'adherent.sectionLocale' => @$_POST['adherent_sectionlocale'],
+		'adhesion.montantCotisation' => @$_POST['adhesion_montantCotisation'],
+		
+		'adhesion.isRenouvellement' => @$_POST['adhesion_isRenouvellement'],
+		'adhesion.accepteRIStatut' => @$_POST['accepte'],
+		'adhesion.declarationHonneur' => @$_POST['accepte'],
+		'adhesion.optinStat' => @$_POST['accepte'],
+	));
+	$arrayML = PPlib\adhesion\listMailingLists();
+	$aValues['adherent.abonnementML'] = '';
+	
+	foreach($arrayML as $ML) {
+		
+		if(empty($_POST['ml_'.$ML['code']])) {
+			continue;
+		}//end if
+		
+		$aValues['adherent.abonnementML'].= $ML['code'].';';
+	}//end foreach
+}//end if
 
 $arrayDon = PPlib\adhesion\listDonPostes();
 $isDon = (@$_POST['type_action'] == 'don');
+
 foreach($arrayDon as $don) {
+	
 	if(empty($_POST['don_'.$don['oid']])) {
 		continue;
-	}
+	}//end if
+	
 	if(!isset($aValues['don.details'])) {
 		$aValues['don.details'] = array();
-	}
+	}//end if
+	
 	$aValues['don.details'][$don['oid']] = $_POST['don_'.$don['oid']];
 	$isDon = 1;
-}
+	
+}//end foreach
+
 if($isDon) {
-$aValues = array_merge($aValues, array(
-	// 'don.oid' => NULL,
-	// 'don.reference' => NULL,
-	'personne.hasDon' => 1,
-	'don.montantDon' => '0',
-	'don.accepteRIStatut' => @$_POST['accepte'],
-	'don.declarationHonneur' => @$_POST['accepte'],
-	'don.optinStat' => @$_POST['accepte'],
-));
-}
+	
+	$aValues = array_merge($aValues, array(
+		// 'don.oid' => NULL,
+		// 'don.reference' => NULL,
+		'personne.hasDon' => 1,
+		'don.montantDon' => '0',
+		'don.accepteRIStatut' => @$_POST['accepte'],
+		'don.declarationHonneur' => @$_POST['accepte'],
+		'don.optinStat' => @$_POST['accepte'],
+	));
+	
+}//end if
 
 
 $aResult = PPlib\adhesion\saveAdhesionFormValues($aValues);
+
 /*
 echo "<pre>\n";
 echo "Les données traitées\n";
@@ -98,33 +113,38 @@ print_r($aValues);
 
 echo str_repeat('-', 60), "\n\n";
 die();*/
+
 if($aResult['issue'] == ACTION_SUCCESS){
-	// Affichage du formulaire à payer
-	$sHtmlFormCode = PPlib\adhesion\createFormApayerfr($aValues, "Payer maintenant sur Apayer.fr");
+	// Affichage du formulaire paybox
+	$sHtmlFormCode = PPlib\adhesion\createFormPayboxCGI($aValues, "Payer maintenant");
+	
 	echo $sHtmlFormCode;
 	?>
 	<script type="text/javascript">
 		$(function() {
-			$('#formApayerfr').submit();
+			$('#PaymentRequestPAYBOX').submit();
 		});
 	</script>
+	
 	<?php 
-	/*
-	$sHtmlFormCode = PPlib\adhesion\createFormCMCIC($aValues, "Payer maintenant sur un serveur CM-CIC");
-	echo $sHtmlFormCode;
-	*/
-}elseif($aResult['issue'] == ACTION_FAILURE){
+}//end if
+elseif($aResult['issue'] == ACTION_FAILURE){
+
 	unset($aResult['issue'], $aResult['message']);
+	
 	echo '<h4>Certaines données sont invalides !</h4>'.PHP_EOL;
 	echo '<ul>'.PHP_EOL;
+	
 	foreach($aResult as $sIndex => $sValue){
-		//echo '<li>'.sprintf("\t%s => %s\n", $sIndex, $sValue).'</li>'.PHP_EOL;
 		echo '<li>'.htmlentities($sValue, null, 'utf-8').'</li>'.PHP_EOL;
-	}
+	}//end foreach
+	
 	echo '</ul>'.PHP_EOL;
-}elseif($aResult['issue'] == ACTION_FAILURE){
+}//end elseif
+elseif($aResult['issue'] == ACTION_FAILURE){
+
 	echo '<h4>In problème technique est survenu !</h4>'.PHP_EOL;
 	echo '<ul>'.PHP_EOL;
 		echo '<li>Problème technique : '.htmlentities($aResult['message'], null, 'utf-8').'</li>'.PHP_EOL;
 	echo '</ul>'.PHP_EOL;
-}
+}//end elseif

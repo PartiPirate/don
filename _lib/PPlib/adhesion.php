@@ -532,9 +532,9 @@ EOT;
 	
 }//end function
 
-
 /**
- * Construit un formulaire html de paiement cm-cic. La plupart des champs sont hidden
+ * Construit un formulaire html de paiement paybox via CGI. La plupart des champs sont hidden
+ * Le mode utilisé est par fichier local
  *
  * @param array $aValues les valeurs à enregistrer, voir 'checkAdhesionFormValues' pour le détail
  * @param string $sTextBouton le texte du bouton de validation
@@ -544,203 +544,184 @@ EOT;
  *			'message' => "Le message d'erreur"
  *		);
  */
-function createFormCMCIC(&$aValues, $sTextBouton = "Payer maintenant"){
-	
+function createFormPayboxCGI(&$aValues, $sTextBouton = "Payer maintenant"){
+
 	try {
 		$oDBH = lib\SqlGetHandle();
-	
-		$sInsertPayment = "INSERT INTO `PP_CMCIC_TRANSACTION` (
+
+		$sInsertPayment = "INSERT INTO `PP_PAYBOX_TRANSACTION` (
 			`reference`, `fields`, `hmac`, `paymentDone`, `issue`, `DON_oid`, `ADHESION_oid`, `dateCreation`
-		) 
+		)
 		VALUES (
 			%s, %s, %s, %d, %s, %d, %d, %s
 		);";
-		
-		$sUpdatePayment = "UPDATE `PP_CMCIC_TRANSACTION` SET `reference` = %s, `fields` = %s, `hmac` = %s WHERE `oid` = %d";
 
-		
+		$sUpdatePayment = "UPDATE `PP_PAYBOX_TRANSACTION` SET `reference` = %s, `fields` = %s, `hmac` = %s WHERE `oid` = %d";
+
+
 		// ----------------------------------------------------------------------------
 		// Premier enregistrement pour obtenir la référence du paiement
 		// ----------------------------------------------------------------------------
 		$sInsertPaymentSQL = sprintf($sInsertPayment,
-			$oDBH->quote(''), $oDBH->quote(''), $oDBH->quote(''), 0, $oDBH->quote('En cours'),
-			$aValues['don.oid'],
-			$aValues['adhesion.oid'],
-			$oDBH->quote(date('Y-m-d H:m:s'))
+				$oDBH->quote(''), $oDBH->quote(''), $oDBH->quote(''), 0, $oDBH->quote('En cours'),
+				$aValues['don.oid'],
+				$aValues['adhesion.oid'],
+				$oDBH->quote(date('Y-m-d H:m:s'))
 		);
-		
+
 		$oDBH->query($sInsertPaymentSQL);
-					
+			
 		$iPaymentOID = (int)$oDBH->lastInsertId();
-		
+
 	}//end try
 	catch (PDOException $e) {
-	
+
 		return array(
-			'issue' => ACTION_ERROR,
-			'message' => $e->getMessage()
+				'issue' => ACTION_ERROR,
+				'message' => $e->getMessage()
 		);
-		
+
 	}//end cacth
-	
+
 	// ----------------------------------------------------------------------------
-	// CIC
+	// PAYBOX
 	// ----------------------------------------------------------------------------
-	$sOptions = "";
-	
+	// Format du fichier
+	$sFileContent = <<<EOT
+
+# Numéro de site (TPE) donné par la banque
+PBX_SITE=%s
+			
+# Numéro de rang (« machine ») donné par la banque
+PBX_RANG=%s
+			
+# Identifiant PAYBOX fourni par PAYBOX
+PBX_IDENTIFIANT=%s
+			
+# Montant total de l’achat en centimes sans virgule ni point.
+PBX_TOTAL=%d
+
+# Code monnaie de la transaction suivant la norme ISO 4217
+PBX_DEVISE=%d
+
+# référence commande.
+PBX_CMD=%s
+			
+# Adresse email de l’acheteur (porteur de carte).
+PBX_PORTEUR=%s
+
+# Variables renvoyées par Paybox (montant, référence commande, numéro de transaction, numéro
+# d’abonnement et numéro d’autorisation)
+PBX_RETOUR=montant:M;ref:R;auto:A;trans:T;erreur:E;sign:K
+			
+# Page de retour de Paybox après paiement accepté
+PBX_EFFECTUE=%s/merci.php
+			
+# Page de retour de Paybox après paiement refusé
+PBX_REFUSE=%s/regrets.php
+			
+# Page de retour de Paybox après paiement annulé
+PBX_ANNULE=%s/regrets.php
+
+# Langue de l'interface
+PBX_LANGUE=%s
+
+# URL du serveur de paiement primaire de Paybox
+PBX_PAYBOX=%s
+
+# Url de notification
+PBX_REPONDRE_A=%s
+			
+# On force le mode de maiment par CB
+PBX_TYPEPAIEMENT=CARTE
+			
+# url backup à ne conserver qu'en mode preprod
+PBX_BACKUP1=%s
+PBX_BACKUP2=%s
+
+EOT;
+
 	// Reference: unique, alphaNum (A-Z a-z 0-9), 12 characters max
 	// Format YY0000000NNNN, pad avec des 0 suivant l'oid de la transaction
 	$sReference = sprintf('%s%s', date("Y"), str_pad((string)$iPaymentOID, 8, '0', STR_PAD_LEFT));
 
+	// Fichier de paramètre pour paybox
+	$sPayboxFile = PPLIB_PATH_PAYBOX_FILES."/{$sReference}.pbx";
+	
 	// Amount : format  "xxxxx.yy" (no spaces)
-	$sMontant = sprintf('%.2f', $aValues['don.montantDon'] + $aValues['adhesion.montantCotisation']);
+	$sMontant = str_replace('.', '', sprintf('%.2f', $aValues['don.montantDon'] + $aValues['adhesion.montantCotisation']));
 
-	// Currency : ISO 4217 compliant
-	$sDevise  = "EUR";
-
-	// free texte : a bigger reference, session context for the return on the merchant website
-	$sTexteLibre = sprintf("Référence personne : %s\nRéférence adhésion : %s\nRéférence don :%s", 
-		$aValues['personne.reference'], $aValues['adhesion.reference'], $aValues['don.reference']
-	);
-	
-	$sTexteLibre = \HtmlEncode($sTexteLibre); // Définie dans CMCIC_Tpe.inc.php
-	
 	// transaction date : format d/m/y:h:m:s
 	$sDate = date("d/m/Y:H:i:s");
-
-	// Language of the company code
-	$sLangue = "FR";
-
-	// customer email
-	$sEmail = CMCIC_PAYMENT_CONTACT;
-
-	$sUrlRetourBase = sprintf('%s/paymentReturn.php?tid=%s', URL_ROOT, $sReference);
-	
-	// Constantes utilisées par CMCIC_Tpe
-	define ("CMCIC_URLOK", sprintf('%s&status=1', $sUrlRetourBase));
-	define ("CMCIC_URLKO", sprintf('%s&status=0', $sUrlRetourBase));
 	
 	// ----------------------------------------------------------------------------
-	// Non utilsé mais doit être présent
-	// ----------------------------------------------------------------------------
 
-	// between 2 and 4
-	//$sNbrEch = "4";
-	$sNbrEch = "";
+	$sFileContent = utf8_decode(sprintf(
+		$sFileContent,
+		PAYBOX_SITE,
+		PAYBOX_RANG,
+		PAYBOX_IDENTIFIANT,
+		$sMontant,
+		PAYBOX_DEVISE_EURO,
+		$sReference,
+		$aValues['personne.email'],
+		URL_ROOT,
+		URL_ROOT,
+		URL_ROOT,
+		PAYBOX_LANG_FRA,
+		PAYBOX_PAYMENT_URL,
+		PAYBOX_EVENT_URL,
+		PAYBOX_PAYMENT_URL_BACKUP1,
+		PAYBOX_PAYMENT_URL_BACKUP2
+	));
 
-	// date echeance 1 - format dd/mm/yyyy
-	//$sDateEcheance1 = date("d/m/Y");
-	$sDateEcheance1 = "";
-
-	// montant échéance 1 - format  "xxxxx.yy" (no spaces)
-	//$sMontantEcheance1 = "0.26" . $sDevise;
-	$sMontantEcheance1 = "";
-
-	// date echeance 2 - format dd/mm/yyyy
-	$sDateEcheance2 = "";
-
-	// montant échéance 2 - format  "xxxxx.yy" (no spaces)
-	//$sMontantEcheance2 = "0.25" . $sDevise;
-	$sMontantEcheance2 = "";
-
-	// date echeance 3 - format dd/mm/yyyy
-	$sDateEcheance3 = "";
-
-	// montant échéance 3 - format  "xxxxx.yy" (no spaces)
-	//$sMontantEcheance3 = "0.25" . $sDevise;
-	$sMontantEcheance3 = "";
-
-	// date echeance 4 - format dd/mm/yyyy
-	$sDateEcheance4 = "";
-
-	// montant échéance 4 - format  "xxxxx.yy" (no spaces)
-	//$sMontantEcheance4 = "0.25" . $sDevise;
-	$sMontantEcheance4 = "";
-	// ----------------------------------------------------------------------------
-	$oTpe = new \CMCIC_Tpe($sLangue);     		
-	$oHmac = new \CMCIC_Hmac($oTpe);      	        
-
-	// Control String for support
-	$CtlHmac = sprintf(CMCIC_CTLHMAC, $oTpe->sVersion, $oTpe->sNumero, $oHmac->computeHmac(sprintf(CMCIC_CTLHMACSTR, $oTpe->sVersion, $oTpe->sNumero)));
-
-	// Data to certify
-	$PHP1_FIELDS = sprintf(CMCIC_CGI1_FIELDS,     $oTpe->sNumero,
-												  $sDate,
-												  $sMontant,
-												  $sDevise,
-												  $sReference,
-												  $sTexteLibre,
-												  $oTpe->sVersion,
-												  $oTpe->sLangue,
-												  $oTpe->sCodeSociete, 
-												  $sEmail,
-												  $sNbrEch,
-												  $sDateEcheance1,
-												  $sMontantEcheance1,
-												  $sDateEcheance2,
-												  $sMontantEcheance2,
-												  $sDateEcheance3,
-												  $sMontantEcheance3,
-												  $sDateEcheance4,
-												  $sMontantEcheance4,
-												  $sOptions);
-
-	// MAC computation
-	$sMAC = $oHmac->computeHmac($PHP1_FIELDS);
-	
 	try{
 		// Enregister dans la base de données
 		$sUpdatePaymentSQL = sprintf($sUpdatePayment,
-			$oDBH->quote($sReference), $oDBH->quote($PHP1_FIELDS), $oDBH->quote($sMAC), $iPaymentOID
+				$oDBH->quote($sReference), $oDBH->quote($sFileContent), "''", $iPaymentOID
 		);
-		
+
 		$oDBH->query($sUpdatePaymentSQL);
+
+		file_put_contents($sPayboxFile, $sFileContent);
 		
 	}//end try
 	catch (PDOException $e) {
-	
+
 		return array(
-			'issue' => ACTION_ERROR,
-			'message' => $e->getMessage()
+				'issue' => ACTION_ERROR,
+				'message' => $e->getMessage()
 		);
-		
+
 	}//end cacth
+
+	$sCGIurl = PAYBOX_CGI_URL;
 	
 	$sForm = <<<EOT
-	<form action="{$oTpe->sUrlPaiement}" method="post" id="PaymentRequestCMC-CIC">
+	<form action="{$sCGIurl}" method="post" id="PaymentRequestPAYBOX">
 
-		<input type="hidden" name="version"             id="version"        value="{$oTpe->sVersion}" />
-		<input type="hidden" name="TPE"                 id="TPE"            value="{$oTpe->sNumero}" />
-		<input type="hidden" name="date"                id="date"           value="{$sDate}" />
-		<input type="hidden" name="montant"             id="montant"        value="{$sMontant}{$sDevise}" />
-		<input type="hidden" name="reference"           id="reference"      value="{$sReference}" />
-		<input type="hidden" name="MAC"                 id="MAC"            value="{$sMAC}" />
-		<input type="hidden" name="url_retour"          id="url_retour"     value="{$oTpe->sUrlKO}" />
-		<input type="hidden" name="url_retour_ok"       id="url_retour_ok"  value="{$oTpe->sUrlOK}" />
-		<input type="hidden" name="url_retour_err"      id="url_retour_err" value="{$oTpe->sUrlKO}" />
-		<input type="hidden" name="lgue"                id="lgue"           value="{$oTpe->sLangue}" />
-		<input type="hidden" name="societe"             id="societe"        value="{$oTpe->sCodeSociete}" />
-		<input type="hidden" name="texte-libre"         id="texte-libre"    value="{$sTexteLibre}" />
-		<input type="hidden" name="mail"                id="mail"           value="{$sEmail}" />
-		<!-- Uniquement pour le Paiement fractionné -->
-		<input type="hidden" name="nbrech"              id="nbrech"         value="{$sNbrEch}" />
-		<input type="hidden" name="dateech1"            id="dateech1"       value="{$sDateEcheance1}" />
-		<input type="hidden" name="montantech1"         id="montantech1"    value="{$sMontantEcheance1}" />
-		<input type="hidden" name="dateech2"            id="dateech2"       value="{$sDateEcheance2}" />
-		<input type="hidden" name="montantech2"         id="montantech2"    value="{$sMontantEcheance2}" />
-		<input type="hidden" name="dateech3"            id="dateech3"       value="{$sDateEcheance3}" />
-		<input type="hidden" name="montantech3"         id="montantech3"    value="{$sMontantEcheance3}" />
-		<input type="hidden" name="dateech4"            id="dateech4"       value="{$sDateEcheance4}" />
-		<input type="hidden" name="montantech4"         id="montantech4"    value="{$sMontantEcheance4}" />
-		<!-- -->
-		
-		<input type="submit" name="bouton"              id="bouton"         value="{$sTextBouton}" />
-	
+		<input type="hidden" name="PBX_MODE" id="paybox-mode"      	   value="13" />
+		<input type="hidden" name="PBX_OPT"  id="paybox-opt"           value="{$sPayboxFile}" />
+
+		<input type="submit" name="bouton"   id="paybox-aymentButton"  value="{$sTextBouton}" />
+
 	</form>
 
 EOT;
 
 	return $sForm;
+
+}//end function
+
+/**
+ * @param string $sRawdata
+ * @param string $sSignature
+ * @return boolean
+ */
+function payboxCheckSignature($sRawdata, $sSignature){
+	
+	$mKey = openssl_pkey_get_public(file_get_contents(PAYBOX_PUBKEY));
+	return openssl_verify($sRawdata, base64_decode($sSignature), $mKey) == 1;
 	
 }//end function
 
