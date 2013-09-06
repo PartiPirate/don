@@ -13,6 +13,8 @@ include_once sprintf('%s/CMCIC_callbackHandler.php', PPLIB_PATH_CMCIC);
 // On mets à jour la base de donn�es
 if($bIsPaymentRequest && $bIsAllowedTransaction){
 	
+	$oDBH = PPlib\SqlGetHandle();
+	
 	try{
 		// Enregister dans la base de donn�es
 		$sUpdatePaymentSQL = sprintf("UPDATE `PP_CMCIC_TRANSACTION` SET `paymentDone` = %d, `issue` = %s WHERE `reference` = %s",
