@@ -1,13 +1,12 @@
 <?php
 /**
  * Librairie adhesion
- * 
+ * @TODO Ajouter Une fonction de test sur la disponibilité des serveurs Voir ManuelIntegrationPayboxSystem_V5.08_FR.pdf p17
  */
 namespace PPlib\adhesion;
 use PPlib as lib;
 
 include_once sprintf('%s/sanitize.php', PPLIB_PATH);
-include_once sprintf('%s/CMCIC_Tpe.inc.php', PPLIB_PATH_CMCIC);
 
 /**
  * Contrôle les données saisies dans un formulaire d'adhesion
@@ -703,6 +702,165 @@ EOT;
 		<input type="hidden" name="PBX_MODE" id="paybox-mode"      	   value="13" />
 		<input type="hidden" name="PBX_OPT"  id="paybox-opt"           value="{$sPayboxFile}" />
 
+		<input type="submit" name="bouton"   id="paybox-aymentButton"  value="{$sTextBouton}" />
+
+	</form>
+
+EOT;
+
+	return $sForm;
+
+}//end function
+
+/**
+ * Construit un formulaire html de paiement paybox via CGI. La plupart des champs sont hidden
+ * Le mode utilisé est par fichier local
+ *
+ * @param array $aValues les valeurs à enregistrer, voir 'checkAdhesionFormValues' pour le détail
+ * @param string $sTextBouton le texte du bouton de validation
+ * @return string le formulaire html ou un tableau contenant les messages d'erreurs.
+ *		array(
+ *			'issue' => ACTION_ERROR,
+ *			'message' => "Le message d'erreur"
+ *		);
+ */
+function createFormPaybox(&$aValues, $sTextBouton = "Payer maintenant"){
+
+	try {
+		$oDBH = lib\SqlGetHandle();
+
+		$sInsertPayment = "INSERT INTO `PP_PAYBOX_TRANSACTION` (
+			`reference`, `fields`, `hmac`, `paymentDone`, `issue`, `DON_oid`, `ADHESION_oid`, `dateCreation`
+		)
+		VALUES (
+			%s, %s, %s, %d, %s, %d, %d, %s
+		);";
+
+		$sUpdatePayment = "UPDATE `PP_PAYBOX_TRANSACTION` SET `reference` = %s, `fields` = %s, `hmac` = %s WHERE `oid` = %d";
+
+
+		// ----------------------------------------------------------------------------
+		// Premier enregistrement pour obtenir la référence du paiement
+		// ----------------------------------------------------------------------------
+		$sInsertPaymentSQL = sprintf($sInsertPayment,
+				$oDBH->quote(''), $oDBH->quote(''), $oDBH->quote(''), 0, $oDBH->quote('En cours'),
+				$aValues['don.oid'],
+				$aValues['adhesion.oid'],
+				$oDBH->quote(date('Y-m-d H:m:s'))
+		);
+
+		$oDBH->query($sInsertPaymentSQL);
+			
+		$iPaymentOID = (int)$oDBH->lastInsertId();
+
+	}//end try
+	catch (PDOException $e) {
+
+		return array(
+				'issue' => ACTION_ERROR,
+				'message' => $e->getMessage()
+		);
+
+	}//end cacth
+
+	// ----------------------------------------------------------------------------
+	// PAYBOX
+	// ----------------------------------------------------------------------------
+	
+	// Reference: unique, alphaNum (A-Z a-z 0-9), 12 characters max
+	// Format YY0000000NNNN, pad avec des 0 suivant l'oid de la transaction
+	$sReference = sprintf('%s%s', date("Y"), str_pad((string)$iPaymentOID, 8, '0', STR_PAD_LEFT));
+
+	// Amount : format  "xxxxx.yy" (no spaces)
+	$sMontant = str_replace('.', '', sprintf('%.2f', $aValues['don.montantDon'] + $aValues['adhesion.montantCotisation']));
+
+	// transaction date : format ISO 8601
+	$aData = array();
+	
+	// L'identifiant de la boutique
+	$aData['PBX_SITE'] = PAYBOX_SITE;
+	
+	// Numéro de rang (« machine ») donné par la banque
+	$aData['PBX_RANG'] = PAYBOX_RANG;
+	
+	// Identifiant PAYBOX fourni par PAYBOX
+	$aData['PBX_IDENTIFIANT'] = PAYBOX_IDENTIFIANT;
+	
+	// Date de la transaction
+	$aData['PBX_TIME'] = date("c");
+	
+	// Montant total de l’achat en centimes sans virgule ni point.
+	$aData['PBX_TOTAL'] = $sMontant;
+			
+	// Code monnaie de la transaction suivant la norme ISO 4217
+	$aData['PBX_DEVISE'] = PAYBOX_DEVISE_EURO;
+			
+	// référence commande.
+	$aData['PBX_CMD'] = $sReference;
+	
+	// Adresse email de l’acheteur (porteur de carte).
+	$aData['PBX_PORTEUR'] = $aValues['personne.email'];
+			
+	// Variables renvoyées par Paybox
+	$aData['PBX_RETOUR'] = "montant:M;ref:R;auto:A;trans:T;erreur:E;sign:K";
+	
+	// Page de retour de Paybox après paiement accepté
+	$aData['PBX_EFFECTUE'] = URL_ROOT."merci.php";
+	
+	// Page de retour de Paybox après paiement refusé
+	$aData['PBX_REFUSE'] = URL_ROOT."regrets.php";
+	
+	// Page de retour de Paybox après paiement annulé
+	$aData['PBX_ANNULE'] = URL_ROOT."regrets.php";
+			
+	// Langue de l'interface
+	$aData['PBX_LANGUE'] = PAYBOX_LANG_FRA;
+			
+	// Url de notification
+	$aData['PBX_REPONDRE_A'] = PAYBOX_EVENT_URL;
+	
+	// On force le mode de maiment par CB
+	$aData['PBX_TYPEPAIEMENT'] = "CARTE";
+
+	// Algorihtme utilisé pour le hash
+	$aData['PBX_HASH'] = "SHA512";
+	
+
+	$sFormParams = '';
+	$aSignedValues = array();
+	
+	foreach($aData as $sIndex => $sValue){
+		$sFormParams .= sprintf('<input type="hidden" name="%s" value="%s" />'.PHP_EOL, $sIndex, $sValue);
+		$aSignedValues[] = sprintf('%s=%s', $sIndex, $sValue);
+	}//end foreach
+	
+	$sHmac = strtoupper(hash_hmac('sha512', implode('&', $aSignedValues), pack("H*", PAYBOX_KEY)));
+	
+	try{
+		// Enregister dans la base de données
+		$sUpdatePaymentSQL = sprintf($sUpdatePayment,
+				$oDBH->quote($sReference), $oDBH->quote($sFields), $oDBH->quote($sHmac), $iPaymentOID
+		);
+
+		$oDBH->query($sUpdatePaymentSQL);
+
+	}//end try
+	catch (PDOException $e) {
+
+		return array(
+				'issue' => ACTION_ERROR,
+				'message' => $e->getMessage()
+		);
+
+	}//end cacth
+
+	$sCGIurl = PAYBOX_PAYMENT_URL;
+	
+	$sForm = <<<EOT
+	<form action="{$sCGIurl}" method="post" id="PaymentRequestPAYBOX">
+		
+		{$sFormParams}
+		<input type="hidden" name="PBX_HMAC" value="{$sHmac}">
 		<input type="submit" name="bouton"   id="paybox-aymentButton"  value="{$sTextBouton}" />
 
 	</form>

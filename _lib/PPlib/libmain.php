@@ -5,7 +5,7 @@
  */
 namespace PPlib;
 
-define('URL_ROOT', "http://aliaslct/dev/VAD-PP/");
+define('URL_ROOT', "http://don-beta.partipirate.ppo/");
 
 define('PPLIB_PATH', dirname(__FILE__));
 define('PPLIB_PATH_TMP', PPLIB_PATH.'/tmp');
@@ -23,16 +23,23 @@ define('SQL_DSN', 'mysql:dbname=don;host=cale.partipirate.ppo');
 define('SQL_USER', 'don');
 define('SQL_PASSWD', '****');
 
-// Paramétrages avec la boutique test
+// Paramétrages avec la boutique test CGI
 /*
 define ("PAYBOX_SITE", "1999888");
 define ("PAYBOX_RANG", "99");
 define ("PAYBOX_IDENTIFIANT", "2");
 */
 
+// Paramétrages avec la boutique test HMAC
+/*
 define ("PAYBOX_SITE", "1999888");
-define ("PAYBOX_RANG", "99");
-define ("PAYBOX_IDENTIFIANT", "2");
+define ("PAYBOX_RANG", "43");
+define ("PAYBOX_IDENTIFIANT", "107975626");
+*/
+
+define ("PAYBOX_SITE", "1999888");
+define ("PAYBOX_RANG", "43");
+define ("PAYBOX_IDENTIFIANT", "107975626");
 
 define ("PAYBOX_DEVISE_EURO", "978");
 define ("PAYBOX_DEVISE_USD", "840");
@@ -40,6 +47,7 @@ define ("PAYBOX_DEVISE_USD", "840");
 define ("PAYBOX_LANG_FRA", "FRA");
 
 define ("PAYBOX_PAYMENT_URL", "https://preprod-tpeweb.paybox.com/cgi/MYchoix_pagepaiement.cgi");
+
 define ("PAYBOX_PAYMENT_URL_BACKUP1", "https://preprod-tpeweb.paybox.com/cgi/MYchoix_pagepaiement.cgi");
 define ("PAYBOX_PAYMENT_URL_BACKUP2", "https://preprod-tpeweb.paybox.com/cgi/MYchoix_pagepaiement.cgi");
 
@@ -49,6 +57,8 @@ define ("PAYBOX_PUBKEY", PPLIB_PATH."/payment/paybox_pubkey.pem");
 define ("PAYBOX_CGI_URL", "http://aliaslct/cgi-bin/paybox.cgi");
 define ("PAYBOX_EVENT_URL", URL_ROOT."payboxEvent.php");
 define ("PAYBOX_PAYMENT_CONTACT", "secretaires-nationaux@partipirate.org");
+
+define("PAYBOX_KEY", '0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF');
 
 ini_set('display_errors', TRUE);
 ini_set('error_reporting', TRUE);

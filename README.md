@@ -8,6 +8,11 @@ Cette interface permet de traiter :
 * les paiements via l'API du crédit mutuel (non testé)
 
 
+== 2012/09/07 ==
+flct :
+* Interface paybox cgi et hmac
+* suppresion interface cmcic
+	
 == 2012/12/24 ==
 
 Contribution de Mistral :
@@ -18,7 +23,7 @@ Cette version est une beta interne
 
 == 2012/11/01 ==
 
-Elle a été developpée initialement par Flecointre.
+Elle a été developpée initialement par flct.
 
 
 
