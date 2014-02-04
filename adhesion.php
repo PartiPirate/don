@@ -52,6 +52,7 @@ else{
 								</div>
 								<div class="contenu_texte">
 <?php include '_lib/validate.php'; ?>
+
 <form id="DoValider" method="POST" accept-charset="utf-8">
 	<input type="hidden" name="type_action" value="<?php echo $type_action; ?>">
 	<span class="red">* champs obligatoires</span>
