@@ -139,19 +139,19 @@ function checkAdhesionFormValues(&$aValues){
 	
 	// -----------------------------------------------------------------------------------
 	// Check values
-	checkStrLength(&$aValues, &$aReturn, 'personne.nom', 'Vous devez saisir un nom');
-	checkStrLength(&$aValues, &$aReturn, 'personne.prenoms', 'Vous devez saisir un prénom');
-	checkStrLength(&$aValues, &$aReturn, 'personne.adresseFiscale_ligne1', "Vous devez au moins indiquer une ligne de l'adresse fiscale");
-	checkStrLength(&$aValues, &$aReturn, 'personne.adresseFiscale_ville', "Vous devez saisir la ville de l'adresse fiscale");
-	checkValueSupZero(&$aValues, &$aReturn, 'personne.adresseFiscale_pays_oid', "Le code pays n'est pas correct");
+	checkStrLength($aValues, $aReturn, 'personne.nom', 'Vous devez saisir un nom');
+	checkStrLength($aValues, $aReturn, 'personne.prenoms', 'Vous devez saisir un prénom');
+	checkStrLength($aValues, $aReturn, 'personne.adresseFiscale_ligne1', "Vous devez au moins indiquer une ligne de l'adresse fiscale");
+	checkStrLength($aValues, $aReturn, 'personne.adresseFiscale_ville', "Vous devez saisir la ville de l'adresse fiscale");
+	checkValueSupZero($aValues, $aReturn, 'personne.adresseFiscale_pays_oid', "Le code pays n'est pas correct");
 	
-	checkValueIsEmail(&$aValues, &$aReturn, 'personne.email', "Le format de l'adresse email n'est pas correct");
+	checkValueIsEmail($aValues, $aReturn, 'personne.email', "Le format de l'adresse email n'est pas correct");
 		
 	if($aValues['personne.adressesDifferentes']){
 	
-		checkStrLength(&$aValues, &$aReturn, 'personne.adressePostale_ligne1', "Vous devez au moins indiquer une ligne de l'adresse postale");
-		checkStrLength(&$aValues, &$aReturn, 'personne.adressePostale_ville', "Vous devez saisir la ville de l'adresse postale");
-		checkValueSupZero(&$aValues, &$aReturn, 'personne.adressePostale_pays_oid', "Le code pays n'est pas correct");
+		checkStrLength($aValues, $aReturn, 'personne.adressePostale_ligne1', "Vous devez au moins indiquer une ligne de l'adresse postale");
+		checkStrLength($aValues, $aReturn, 'personne.adressePostale_ville', "Vous devez saisir la ville de l'adresse postale");
+		checkValueSupZero($aValues, $aReturn, 'personne.adressePostale_pays_oid', "Le code pays n'est pas correct");
 		
 	}//end if
 	else{
@@ -172,8 +172,8 @@ function checkAdhesionFormValues(&$aValues){
 				
 				// On recherche le pseudonyme pour le forum. On renvoie une erreur sur les deux valeurs sinon on synchronise les valeurs
 				if(strlen($aValues['personne.pseudonyme']) == 0 && strlen($aValues['adherent.pseudonymeForum'] == 0)){
-					checkStrLength(&$aValues, &$aReturn, 'personne.pseudonyme', "Vous devez indiquer le pseudonyme sur le forum");
-					checkStrLength(&$aValues, &$aReturn, 'adherent.pseudonymeForum', "Vous devez indiquer le pseudonyme sur le forum");
+					checkStrLength($aValues, $aReturn, 'personne.pseudonyme', "Vous devez indiquer le pseudonyme sur le forum");
+					checkStrLength($aValues, $aReturn, 'adherent.pseudonymeForum', "Vous devez indiquer le pseudonyme sur le forum");
 				}//end if
 				elseif(strlen($aValues['personne.pseudonyme']) == 0){
 					$aValues['personne.pseudonyme'] = $aValues['adherent.pseudonymeForum'];
@@ -187,7 +187,7 @@ function checkAdhesionFormValues(&$aValues){
 				$aValues['adherent.pseudonymeForum'] = '';
 			}//end else
 			
-			checkValueLimiteAdhesion(&$aValues, &$aReturn, 'adhesion.montantCotisation', "Le montant de la cotisation doit être supérieur à 6 euros et inférieur à 7500 euros");
+			checkValueLimiteAdhesion($aValues, $aReturn, 'adhesion.montantCotisation', "Le montant de la cotisation doit être supérieur à 6 euros et inférieur à 7500 euros");
 			
 		}//end if
 		else{
@@ -205,7 +205,7 @@ function checkAdhesionFormValues(&$aValues){
 			}//end foreach
 			
 			$aValues['don.montantDon'] = $fMontantDon;
-			checkValueLimiteAdhesion(&$aValues, &$aReturn, 'don.montantDon', "Le montant d'un don doit être inférieur à 7500 euros et supérieur à 10€ (en raison des coûts de traitement)");
+			checkValueLimiteAdhesion($aValues, $aReturn, 'don.montantDon', "Le montant d'un don doit être inférieur à 7500 euros et supérieur à 10€ (en raison des coûts de traitement)");
 			
 		}//end if
 		else{
@@ -245,7 +245,7 @@ function checkAdhesionFormValues(&$aValues){
  */
 function saveAdhesionFormValues(&$aValues){
 	
-	$aReturn = checkAdhesionFormValues(&$aValues);
+	$aReturn = checkAdhesionFormValues($aValues);
 	
 	try {
 		$oDBH = lib\SqlGetHandle();
@@ -491,9 +491,10 @@ function createFormApayerfr(&$aValues, $sTextBouton = "Payer maintenant"){
 		$sSegnmodelinfo = $oElement->getAttribute('value');
 	}//end else
 
-	foreach($aValues as &$value) {
+	foreach($aValues as $value) {
 		$value = utf8_decode($value);
-	}
+	}//end foreach
+	
 	$sMontant = sprintf('%.2f', $aValues['don.montantDon'] + $aValues['adhesion.montantCotisation']);
 	
 	$sCommentaire = sprintf("Adhésion : %s \r\nDon : %s", $aValues['adhesion.reference'], $aValues['don.reference'] );
