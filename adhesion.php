@@ -1,5 +1,5 @@
 <?php
-// paramétrages 
+// paramétrages
 $renouv_on = true; // renouvellements ouverts de janvier à mars uniquement
 
 // gestion parallèle don/adhésion
@@ -39,14 +39,14 @@ if ($type_action === 'adhesion') {
 <p style="font-size:12px">Votre contribution vaudra pour l'année 2013 et vous donne droit à <a href="#mentions">66% de crédit d'impot</a> sur votre imposition 2013.</p>
 <?php
 }
-else{ 
+else{
 ?>
 									<h2>Je fais un don en ligne au Parti Pirate</h2>
 									<br><br/>
 <p style="font-size:12px">Votre contribution vous donne droit à <a href="#mentions">66% de crédit d'impot</a>.</p>
 <?php
 }
-?>	 
+?>
 
 
 								</div>
@@ -70,7 +70,7 @@ else{
 	<br><label class="required" for="frm_adr">Adresse fiscale</label>
 	<br><input class="long" type="text" id="frm_adr" name="personne_adresseFiscale_ligne1" value="<?php echo htmlentities(@$_POST['personne_adresseFiscale_ligne1']); ?>">
 	<br><input class="long" type="text" id="frm_adr2" name="personne_adresseFiscale_ligne2" value="<?php echo htmlentities(@$_POST['personne_adresseFiscale_ligne2']); ?>">
-	
+
 	<br><label class="required" for="frm_cp">Code Postal </label>
 	<label class="required" for="frm_vil">Ville </label>
 	<label class="required" for="pays" id="pays_label">Pays</label>
@@ -90,16 +90,16 @@ else{
 			echo '>'.htmlentities($pays['libelle']).'</option>';
 		}
 	?></select>
-	
-	
+
+
 	<br/><label class="form_label" for="frm_tel">Téléphone </label> <label for="frm_pse">Pseudo </label>
 	<br/><input type="text" name="personne_telephone" id="frm_tel" value="<?php echo htmlentities(@$_POST['personne_telephone']); ?>"> <input type="text" name="personne_pseudonyme" id="frm_pse" value="<?php echo htmlentities(@$_POST['personne_pseudonyme']); ?>">
 
-<?php 
+<?php
 if ($type_action == 'adhesion' ) {
 ?>
 	<br/><label></label><input type="checkbox" name="adherent_inscritForum" value="1" id="frm_cb" <?php if(@$_POST['adherent_inscritForum']) { echo 'checked="checked"'; }?>> <label for="frm_cb" class="forum">Je suis membre du forum</label>
-	
+
 	<h3>Votre adhésion 2013</h3>
 	<ul>
 		<li><b>Plein Tarif :</b> libre à partir de <u>24€</u> ;</li>
@@ -108,7 +108,7 @@ if ($type_action == 'adhesion' ) {
 	</ul>
 	<div class="required">
 		<label for="frm_montant" style="display:inline">Montant (minimum 6€)</label>
-		<input id="frm_montant" type="text" name="adhesion_montantCotisation" class="montant" value="<?php if(isset($_POST['adhesion_montantCotisation'])) { echo $_POST['adhesion_montantCotisation']; } else { echo '0';} ?>">€ 
+		<input id="frm_montant" type="text" name="adhesion_montantCotisation" class="montant" value="<?php if(isset($_POST['adhesion_montantCotisation'])) { echo $_POST['adhesion_montantCotisation']; } else { echo '0';} ?>">€
 	</div>
 	<br/>&nbsp;
 	<?php // La partie concernant les renouvellements ne doit être active que de janvier à mars de chaque année
@@ -117,7 +117,7 @@ if ($type_action == 'adhesion' ) {
 		<label for="rd_r" class="radio" style="display:inline;"> Si vous étiez déjà adhérent en 2012, merci de cocher cette case.</label>
 		</p>
 	<?php }//end renouvellement ?>
-<?php } 
+<?php }
 if ($type_action === 'adhesion' ) {
 ?>
 	<h3>S'investir au niveau local</h3>
@@ -140,7 +140,7 @@ $bActiveTresor = true;
 if($bActiveTresor){
 ?>
 	<h3>Contribuer à un budget spécifique par un don (facultatif)</h3>
-	
+
 	<?php
 	$arrayDon = PPlib\adhesion\listDonPostes();
 	foreach($arrayDon as $don) {
@@ -208,10 +208,10 @@ if($bActiveTresor){
 		<br>
 <?php } ?>
 		<label for="frm_com">Correspondance</label>
-		<br><textarea id="frm_com" name="personne_commentaires"><?php echo htmlentities($_POST['personne_commentaires']); ?></textarea>
+		<br><textarea id="frm_com" name="personne_commentaires"><?php echo htmlentities(isset($_POST['personne_commentaires'])?$_POST['personne_commentaires']:''); ?></textarea>
 		<br>
 		<div class="required">
-			<input type="checkbox" name="accepte" id="accepte" value="1" <?php if (isset($_POST['accepte'])) { echo 'checked="checked"'; } ?>> 
+			<input type="checkbox" name="accepte" id="accepte" value="1" <?php if (isset($_POST['accepte'])) { echo 'checked="checked"'; } ?>>
 			<label for="accepte" style="display:inline">Je signe la <a href="#conditions">déclaration sur l'honneur</a> et j'ai lu les <a href="#mentions">mentions à savoir</a>.</label><br>
 		</div>
 <?php if ($type_action === 'adhesion' ) { ?>
@@ -219,7 +219,7 @@ if($bActiveTresor){
 <?php } else { ?>
 		<input type="submit" value="Donner !" class="bt_send"><br>
 <?php } ?>
-		</form>									
+		</form>
 <?php if ($type_action === 'adhesion' ) { ?>
 	<h3 id="conditions">Déclaration sur l'honneur</h3>
 		<p>Je déclare sur l’honneur que je suis à l’origine des fonds versés pour cette adhésion au Parti Pirate, et que ces fonds ne viennent pas d’une tierce personne ou d’une personne morale.</p>
@@ -231,18 +231,18 @@ if($bActiveTresor){
 		<p>Ce bulletin vous permet d'adhérer jusqu'à fin de l'année civile. Pour ceux qui adhèrent en fin d'année (de novembre à décembre), l'adhésion est automatiquement prolongée jusqu'à la fin de l'année suivante.</p>
 		<!--p>Si vous êtes déjà inscrit dans, le forum, votre compte et votre pseudo de forum seront promus au groupe "adhérent", et cette information (que tel pseudo est adhérent) sera visible du public. Cette promotion est automatique. Si vous ne le souhaitez pas, ne nous communiquez pas votre pseudo du forum.</p-->
 		<p>Conformément à l’article 34 de la loi N°78-17 du 6 janvier 1978 dite « Informatique et Libertés », vous disposez d’un droit d’accès, de modification, de rectification, de suppression des données qui vous concernent sur simple demande à &lt;listes(at)lists.partipirate.org&gt;. Le Parti Pirate est une association à but politique régie par la loi du 1er juillet 1901. L’Association de Financement du Parti Pirate, déclarée le 21/04/11 a été agréée le 18/07/11.</p>
-		
+
 		<p>Voir <a href="https://www.partipirate.org/spip.php?article107">cette page</A> pour notre politique <i>Informatique & Liberté</I>, de confidentialité des donneés communiquées sur ce bulletin, et les autres mentions à savoir avant d'adhérer.
 <?php } else { ?>
 	<h3 id="conditions">Déclaration sur l'honneur</h3>
 		<p>Je déclare sur l’honneur que je suis à l’origine des fonds versés pour ce don au Parti Pirate, et que ces fonds ne viennent pas d’une tierce personne ou d’une personne morale.</p>
 	<h3 id="mentions">À savoir</h3>
 		<p>Le Parti Pirate est un parti politique, votre cotisation vous donne droit &agrave; une r&eacute;duction de 66&nbsp;% des sommes vers&eacute;es dans la limite de 20&nbsp;% du revenu imposable (<a href="http://vosdroits.service-public.fr/F427.xhtml" target="_blank">voir cette page</A>). Il vous sera &eacute;tabli un certificat fiscal nominatif que vous recevrez par la Poste en mars pour l'année précédente.<p>
-		<p>Le Parti Pirate est une association à but politique régie par la loi du 1er juillet 1901. L’Association de Financement du Parti Pirate, déclarée le 21/04/11 a été agréée le 18/07/11.</p>                    
+		<p>Le Parti Pirate est une association à but politique régie par la loi du 1er juillet 1901. L’Association de Financement du Parti Pirate, déclarée le 21/04/11 a été agréée le 18/07/11.</p>
 		<p>Les données collectées seront utilisées pour l’établissement et l'envoi des <em>reçus fiscaux</em>, pour le contrôle des comptes auprès de la CNCCFP (Commission nationale des comptes de campagne et des financements politiques) et à des fins de comptabilité interne ; elles seront communiquées au sectr&eacute;tariat national et, de façon partielle, au chargé de trésorerie de la section locale ou interne à laquelle vous donnez. En sus de ces traitements, vos données seront utilisées de manière anonyme pour des traitements statistiques qui pourront être publiés. <!--Si vous souhaitez vous opposer à ce traitement statistique, faites-le savoir en cochant la case appropriée sur le formulaire de don. --></p>
-		<p>Conformément à la loi N°78-17 du 6 janvier 1978 dite «&nbsp;Informatique et Libertés&nbsp;», vous disposez d’un droit d’accès, de modification, de rectification, de suppression des données qui vous concernent. Toute demande peut être adressée à &lt;listes(at)lists.partipirate.org&gt;. 
+		<p>Conformément à la loi N°78-17 du 6 janvier 1978 dite «&nbsp;Informatique et Libertés&nbsp;», vous disposez d’un droit d’accès, de modification, de rectification, de suppression des données qui vous concernent. Toute demande peut être adressée à &lt;listes(at)lists.partipirate.org&gt;.
 <?php } ?>
-	<p>Vous devez indiquer votre identit&eacute; v&eacute;ritable&nbsp;; donner une fausse identit&eacute; constituerait une fraude fiscale.<p> 
+	<p>Vous devez indiquer votre identit&eacute; v&eacute;ritable&nbsp;; donner une fausse identit&eacute; constituerait une fraude fiscale.<p>
 	<h3 id="legal">Mentions légales</h3>
 	<p>Consulter <a href="https://www.partipirate.org/spip.php?article107">cette page</a> pour les autres mentions légales.</p>
 	<p>&nbsp;</p>
@@ -270,6 +270,6 @@ if($bActiveTresor){
 					</div>
 				</div>
 			</div>
-        </div> 
+        </div>
     </body>
 </html>
