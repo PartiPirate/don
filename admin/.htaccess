@@ -1,6 +1,9 @@
 deny from all
 allow from 10.65.209.14 #Mistral
-AuthUserFile /var/www/don-beta.partipirate.ppo/.htpasswd
+allow from 10.65.209.126 #Drenskin
+allow from 10.65.209.222 #Natouille
+allow from 10.65.209.30 #Nalaf
+AuthUserFile /var/www/don.partipirate.org/.htpasswd
 AuthGroupFile /dev/null
 AuthName "Restricted Access"
 AuthType Basic

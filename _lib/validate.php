@@ -9,6 +9,13 @@ if(!count($_POST)) {
 foreach($_POST as &$value) {
 	$value = utf8_decode($value);
 }
+/*if(!@$_POST['adherent_isMajeur']) {
+	echo '<h4>Inscription en ligne impossible !</h4>'.PHP_EOL;
+	echo '<ul>'.PHP_EOL;
+		echo '<li>Les adhérents mineurs de 16ans et plus doivent souscrire par <a href="https://www.partipirate.org/IMG/pdf/adhesion-v130107.pdf">bulletin papier</a> exclusivement. </li>'.PHP_EOL;
+	echo '</ul>'.PHP_EOL;
+	return;
+}*/
 
 $aValues = array(
 	// 'personne.oid' => NULL,

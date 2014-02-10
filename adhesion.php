@@ -36,7 +36,8 @@ if ($type_action === 'adhesion') {
 ?>
                                     <h2>J'adhère en ligne au Parti Pirate</h2>
 									<br><br/>
-<p style="font-size:12px">Votre contribution vaudra pour l'année 2013 et vous donne droit à <a href="#mentions">66% de crédit d'impot</a> sur votre imposition 2013.</p>
+<p style="font-size:12px">Votre contribution vaudra pour l'année 2014 et vous donne droit à <a href="#mentions">66% de crédit d'impot</a> sur votre imposition 2014.</p>
+<?php /*<p style="color:red;font-size:12px;">Attention, les adhésions prises après le 29 décembre (inclu), donneront lieu à l'émission d'un recu en 2015 (pour l'imposition 2014).</p>*/ ?>
 <?php
 }
 else{ 
@@ -100,7 +101,7 @@ if ($type_action == 'adhesion' ) {
 ?>
 	<br/><label></label><input type="checkbox" name="adherent_inscritForum" value="1" id="frm_cb" <?php if(@$_POST['adherent_inscritForum']) { echo 'checked="checked"'; }?>> <label for="frm_cb" class="forum">Je suis membre du forum</label>
 	
-	<h3>Votre adhésion 2013</h3>
+	<h3>Votre adhésion 2014</h3>
 	<ul>
 		<li><b>Plein Tarif :</b> libre à partir de <u>24€</u> ;</li>
 		<li><b>Demi-tarif :</b> <u>12€</u> - Ce tarif est accessible aux mineurs, aux étudiants et aux demandeurs d'emploi ;</li>
@@ -114,7 +115,7 @@ if ($type_action == 'adhesion' ) {
 	<?php // La partie concernant les renouvellements ne doit être active que de janvier à mars de chaque année
 		if ($renouv_on === true ) {
 	?>	<p><input id="rd_r" type="checkbox" name="adhesion_isRenouvellement" value="1" <?php if(	@$_POST['adhesion_isRenouvellement']) { echo 'checked="checked"'; }?>>
-		<label for="rd_r" class="radio" style="display:inline;"> Si vous étiez déjà adhérent en 2012, merci de cocher cette case.</label>
+		<label for="rd_r" class="radio" style="display:inline;"> Si vous étiez déjà adhérent en 2013, merci de cocher cette case.</label>
 		</p>
 	<?php }//end renouvellement ?>
 <?php } 
@@ -133,13 +134,13 @@ if ($type_action === 'adhesion' ) {
 		}
 	?></select>
 	<br/>&nbsp;
-	<p><i>Si votre région n'est pas présente dans la liste, c'est qu'aucun groupe local ne s'est encore formalisé dans votre région. Vous pouvez vous <a href="http://wiki.partipirate.org/wiki/Sections_locales" target="_blank">renseigner ici</a> pour initier un projet.</i></p>
+	<p><i>Si votre région n'est pas présente dans la liste, c'est qu'aucun groupe local ne s'est encore formalisé dans votre région. Vous pouvez vous <a href="https://www.partipirate.org/spip.php?rubrique11" target="_blank">renseigner ici</a> pour initier un projet.</i></p>
 <?php }
 
 $bActiveTresor = true;
 if($bActiveTresor){
 ?>
-	<h3>Contribuer à un budget spécifique</h3>
+	<h3>Contribuer à un budget spécifique par un don<?php if ($type_action === 'adhesion' ) {?> (facultatif)<?php }?></h3>
 	
 	<?php
 	$arrayDon = PPlib\adhesion\listDonPostes();
@@ -208,7 +209,7 @@ if($bActiveTresor){
 		<br>
 <?php } ?>
 		<label for="frm_com">Correspondance</label>
-		<br><textarea id="frm_com" name="personne_commentaires"><?php echo htmlentities($_POST['personne_commentaires']); ?></textarea>
+		<br><textarea id="frm_com" name="personne_commentaires"><?php echo htmlentities(isset($_POST['personne_commentaires'])?$_POST['personne_commentaires']:''); ?></textarea>
 		<br>
 		<div class="required">
 			<input type="checkbox" name="accepte" id="accepte" value="1" <?php if (isset($_POST['accepte'])) { echo 'checked="checked"'; } ?>> 
@@ -225,7 +226,7 @@ if($bActiveTresor){
 		<p>Je déclare sur l’honneur que je suis à l’origine des fonds versés pour cette adhésion au Parti Pirate, et que ces fonds ne viennent pas d’une tierce personne ou d’une personne morale.</p>
 	<h3 id="mentions">À savoir</h3>
 		<p>L'enregistrement des adhésions en ligne se fait une fois par semaine. Ne vous inquiétez pas si vous ne recevez pas votre mail de bienvenue instantanément. <a href="https://www.partipirate.org/spip.php?article119">Suivez ce lien</A> pour savoir comment suivre l'avancement de votre adhésion.</p>
-		<p>Outre nos <a href="https://partipirate.org/statuts.pdf">statuts</a> et notre <a href="https://partipirate.org/ri.pdf">règlement intérieur</a> que vous devrez lire puisque vous vous engagez à vous y conformer, nous vous invitons particulièrement à prendre connaissance de notre <a href="http://partipirate.org/blog/com.php?id=214">déclaration de politique générale</a> et de notre <a href="http://legislatives.partipirate.org/2012/notre-programme/">programme</a> avant de remplir votre demande d'adhésion.</p>
+		<p>Outre nos <a href="https://wiki.partipirate.org/Statuts">statuts</a> et notre <a href="https://partipirate.org/ri.pdf">règlement intérieur</a> que vous devrez lire puisque vous vous engagez à vous y conformer, nous vous invitons particulièrement à prendre connaissance de notre <a href="https://www.partipirate.org/spip.php?article112">déclaration de politique générale</a> et de notre <a href="https://wiki.partipirate.org/Programme">programme</a> avant de remplir votre demande d'adhésion.</p>
 		<p>Les adhésions en tant que personne morales ne sont pas ouvertes.</p>
 		<p>Le Parti Pirate est un parti politique, votre cotisation vous donne droit &agrave; une r&eacute;duction de 66&nbsp;% des sommes vers&eacute;es dans la limite de 20&nbsp;% du revenu imposable (<a href="http://vosdroits.service-public.fr/F427.xhtml" target="_blank">voir cette page</A>). Il vous sera &eacute;tabli un certificat fiscal nominatif que vous recevrez par la Poste en mars pour l'année précédente.<p>
 		<p>Ce bulletin vous permet d'adhérer jusqu'à fin de l'année civile. Pour ceux qui adhèrent en fin d'année (de novembre à décembre), l'adhésion est automatiquement prolongée jusqu'à la fin de l'année suivante.</p>
