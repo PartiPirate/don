@@ -88,7 +88,7 @@ else{
 			}elseif($_POST['personne_adresseFiscale_pays_oid'] == $pays['oid']) {
 				echo ' selected';
 			}
-			echo '>'.htmlentities($pays['libelle']).'</option>';
+			echo '>'.htmlentities($pays['libelle'],ENT_COMPAT | ENT_HTML401,'ISO-8859-1').'</option>';
 		}
 	?></select>
 
@@ -130,7 +130,7 @@ if ($type_action === 'adhesion' ) {
 			if(@$_POST['adherent_sectionlocale'] == $SL['oid']) {
 				echo ' selected';
 			}
-			echo '>'.htmlentities($SL['libelle']).'</option>';
+			echo '>'.htmlentities($SL['libelle'],ENT_COMPAT | ENT_HTML401,'ISO-8859-1').'</option>';
 		}
 	?></select>
 	<br/>&nbsp;
@@ -146,9 +146,9 @@ if($bActiveTresor){
 	$arrayDon = PPlib\adhesion\listDonPostes();
 	foreach($arrayDon as $don) {
 		echo '<div class="budget budget-'.$don['idInt'].($don['brief']?' budget-long':'').($don['type']==5?' budget-sl':'').($don['type']==2?' budget-fade':'').'">';
-		echo '		<label class="title" for="don_'.$don['oid'].'">'.htmlentities($don['libelle']).'</label>';
+		echo '		<label class="title" for="don_'.$don['oid'].'">'.htmlentities($don['libelle'],ENT_COMPAT | ENT_HTML401,'ISO-8859-1').'</label>';
 		if($don['brief']) {
-			echo '	<label class="brief" for="don_'.$don['oid'].'">'.htmlentities($don['brief']).'</label>';
+			echo '	<label class="brief" for="don_'.$don['oid'].'">'.htmlentities($don['brief'],ENT_COMPAT | ENT_HTML401,'ISO-8859-1').'</label>';
 		}
 		echo '<div class="montant"><input type="text" class="montant" name="don_'.$don['oid'].'" id="don_'.$don['oid'].'" value="'.(isset($_POST['don_'.$don['oid']])?$_POST['don_'.$don['oid']]:'0').'">€</div>';
 		echo '</div>';
@@ -203,7 +203,7 @@ if($bActiveTresor){
 			if(@$_POST['ml_'.$ML['code']]) {
 				echo ' checked';
 			}
-			echo '><label for="ml_'.$ML['code'].'" style="display:inline"> - '.htmlentities($ML['libelle']).'</label><br/>';
+			echo '><label for="ml_'.$ML['code'].'" style="display:inline"> - '.htmlentities($ML['libelle'],ENT_COMPAT | ENT_HTML401,'ISO-8859-1').'</label><br/>';
 		}
 		?>
 		<br>
