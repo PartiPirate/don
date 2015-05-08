@@ -1,6 +1,13 @@
 don
 ===
 
+== 2015/05/01 ==
+Remplacé par https://github.com/PartiPirate/ppmoney
+
+
+
+== Ancien Readme ==
+
 Interface don-adhésion du Parti Pirate
 
 Cette interface permet de traiter :
