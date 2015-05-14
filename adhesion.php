@@ -243,7 +243,7 @@ if($bActiveTresor){
 		<p>Les données collectées seront utilisées pour l’établissement et l'envoi des <em>reçus fiscaux</em>, pour le contrôle des comptes auprès de la CNCCFP (Commission nationale des comptes de campagne et des financements politiques) et à des fins de comptabilité interne ; elles seront communiquées au sectr&eacute;tariat national et, de façon partielle, au chargé de trésorerie de la section locale ou interne à laquelle vous donnez. En sus de ces traitements, vos données seront utilisées de manière anonyme pour des traitements statistiques qui pourront être publiés. <!--Si vous souhaitez vous opposer à ce traitement statistique, faites-le savoir en cochant la case appropriée sur le formulaire de don. --></p>
 		<p>Conformément à la loi N°78-17 du 6 janvier 1978 dite «&nbsp;Informatique et Libertés&nbsp;», vous disposez d’un droit d’accès, de modification, de rectification, de suppression des données qui vous concernent. Toute demande peut être adressée à &lt;listes(at)lists.partipirate.org&gt;.
 <?php } ?>
-	<p>Vous devez indiquer votre identit&eacute; v&eacute;ritable&nbsp;; donner une fausse identit&eacute; constituerait une fraude fiscale.<p>
+	<p>Vous devez indiquer votre v&eacute;ritable identit&eacute; car se faire établir et utiliser un re&ccedil;u-don sous une fausse identit&eacute; constituerait une fraude fiscale.<p>
 	<h3 id="legal">Mentions légales</h3>
 	<p>Consulter <a href="https://www.partipirate.org/spip.php?article107">cette page</a> pour les autres mentions légales.</p>
 	<p>&nbsp;</p>
